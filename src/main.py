@@ -1,5 +1,7 @@
 from dotenv import load_dotenv
 import os
+from PyInquirer import prompt
+from examples import custom_style_3
 import speech_recognition as sr
 import openai
 
@@ -9,6 +11,15 @@ openai.api_key = os.getenv('OPENAI_KEY')
 
 recognizer = sr.Recognizer()
 mic = sr.Microphone()
+
+questions = [
+    {
+        'type': 'list',
+        'name': 'user_option',
+        'message': 'Interacting with ChatGPT with your voice',
+        'choices': ["Voice input", "Text input", "Exit"]
+    }
+]
 
 
 def recognize_using_google(audio) -> dict:
@@ -53,11 +64,21 @@ def forward_to_openai_chat(prompt):
 
 
 def main() -> None:
-    audio = listen()
-    text = recognize_using_google(audio)['transcription']
-    print('generated prompt: ', text)
-    response = forward_to_openai_chat(text)
-    print(f'Response from OpenAI:\n """{response}\n"""')
+    while True:
+        options = prompt(questions, style=custom_style_3)
+        if options.get('user_option') == 'Exit':
+            print('Exiting GPT CLI...')
+            break
+        elif options.get('user_option') == 'Voice input':
+            print('Start Talking...')
+            audio = listen()
+            text = recognize_using_google(audio)['transcription']
+            print('generated prompt: ', text)
+        elif options.get('user_option') == 'Text input':
+            text = input('Write your input here: ')
+
+        response = forward_to_openai_chat(text)
+        print(f'Response from OpenAI:\n """{response}\n"""')
 
 
 if __name__ == '__main__':
