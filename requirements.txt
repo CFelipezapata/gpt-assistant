@@ -16,7 +16,6 @@ more-itertools==9.0.0
 multidict==6.0.4
 numpy==1.24.1
 openai==0.26.4
-openai-whisper==20230124
 packaging==23.0
 PyAudio==0.2.13
 pycodestyle==2.10.0
