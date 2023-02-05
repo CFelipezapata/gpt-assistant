@@ -74,9 +74,13 @@ def main() -> None:
             active_session = False
         elif options.get('user_option') == 'Voice input':
             audio = listen()
-            text = recognize_using_google(audio)['transcription']
-            print(f'\nGenerated prompt: {text}\n')
-            forward_to_openai_chat(text)
+            speech_response = recognize_using_google(audio)
+            if speech_response['success']:
+                text = speech_response['transcription']
+                print(f'\nGenerated prompt: {text}\n')
+                forward_to_openai_chat(text)
+            else:
+                print(f'There was an error with the speech recognition tool: {speech_response["error"]}')
         elif options.get('user_option') == 'Text input':
             text = input('Type your input here: ')
             forward_to_openai_chat(text)
