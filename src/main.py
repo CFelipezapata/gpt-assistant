@@ -16,7 +16,7 @@ questions = [
     {
         'type': 'list',
         'name': 'user_option',
-        'message': 'Interacting with ChatGPT with your voice',
+        'message': 'Interact with ChatGPT with your voice or text',
         'choices': ["Voice input", "Text input", "Exit"]
     }
 ]
@@ -31,7 +31,7 @@ def recognize_using_google(audio) -> dict:
     }
     try:
         print('Calling google to recognize audio')
-        response['transcription'] = recognizer.recognize_google(audio)
+        response['transcription'] = recognizer.recognize_google(audio, show_all=True)['alternative'][0]['transcript']
     except sr.RequestError:
         response["success"] = False
         response["error"] = "API unavailable"
@@ -43,7 +43,7 @@ def recognize_using_google(audio) -> dict:
 
 def listen():
     with mic as source:
-        print('listening...')
+        print("Start talking, I'm listening...")
         audio = recognizer.listen(source)
         print('Done!!')
     return audio
@@ -60,25 +60,27 @@ def forward_to_openai_chat(prompt):
         temperature=0.5,
     )
     response = completion.choices[0].text
-    return response
+    print('\nResponse from OpenAI: \n\n', f'"""{response}\n\n"""')
 
 
 def main() -> None:
-    while True:
+    
+    active_session = True
+    
+    while active_session:
         options = prompt(questions, style=custom_style_3)
         if options.get('user_option') == 'Exit':
             print('Exiting GPT CLI...')
-            break
+            active_session = False
         elif options.get('user_option') == 'Voice input':
-            print('Start Talking...')
             audio = listen()
             text = recognize_using_google(audio)['transcription']
-            print('generated prompt: ', text)
+            print(f'\nGenerated prompt: {text}\n')
+            forward_to_openai_chat(text)
         elif options.get('user_option') == 'Text input':
-            text = input('Write your input here: ')
-
-        response = forward_to_openai_chat(text)
-        print(f'Response from OpenAI:\n """{response}\n"""')
+            text = input('Type your input here: ')
+            forward_to_openai_chat(text)
+        
 
 
 if __name__ == '__main__':
