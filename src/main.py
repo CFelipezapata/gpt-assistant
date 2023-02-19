@@ -56,7 +56,6 @@ def forward_to_openai_chat(prompt):
         prompt=prompt,
         max_tokens=1024,
         n=1,
-        stop=None,
         temperature=0.6,
     )
     response = completion.choices[0].text
