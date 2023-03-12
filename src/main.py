@@ -85,6 +85,5 @@ def main() -> None:
             forward_to_openai_chat(text)
         
 
-
 if __name__ == '__main__':
     main()
